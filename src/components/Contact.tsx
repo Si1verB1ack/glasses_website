@@ -17,7 +17,7 @@ export default function Contact() {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    const phoneRegex = /^(0[1-9]{2}\d{6})$/;
+    const phoneRegex = /^0[1-9]{1}[0-9]{7,9}$/;
     if (!phoneRegex.test(data.phone as string)) {
       alert("Please enter a valid phone number");
       setIsSubmitting(false);
