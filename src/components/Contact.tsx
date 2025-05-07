@@ -9,27 +9,16 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     setIsSubmitting(true);
-    setSubmitStatus(null);
 
     const form = e.currentTarget;
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    const phoneRegex = /^0[1-9]{1}[0-9]{7,9}$/;
-    if (!phoneRegex.test(data.phone as string)) {
-      alert("Please enter a valid phone number");
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
       const response = await fetch("/api/send-to-telegram", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: data.name,
           phone: data.phone,
@@ -44,7 +33,6 @@ export default function Contact() {
         setSubmitStatus("error");
       }
     } catch (error) {
-      console.error("Error sending message:", error);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
