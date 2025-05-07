@@ -1,11 +1,54 @@
 import { motion, useInView, useAnimation } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Contact() {
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
+    null
+  );
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted");
-    // Add actual form submission logic here (e.g., API call)
+
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    const phoneRegex = /^(0[1-9]{2}\d{6})$/;
+    if (!phoneRegex.test(data.phone as string)) {
+      alert("Please enter a valid phone number");
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/send-to-telegram", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: data.name,
+          phone: data.phone,
+          message: data.message,
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitStatus("success");
+        form.reset();
+      } else {
+        setSubmitStatus("error");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const ref = useRef(null);
@@ -38,8 +81,8 @@ export default function Contact() {
             Get in Touch
           </h2>
           <p className="text-base sm:text-lg font-body text-gray-600 max-w-3xl mx-auto">
-            Have questions or need assistance? Contact us, and we’ll get back to
-            you promptly.
+            Have questions or need assistance? Contact us, and we'll get back to
+            you promptly via Telegram.
           </p>
         </motion.div>
         <motion.div
@@ -67,18 +110,18 @@ export default function Contact() {
             </div>
             <div>
               <label
-                htmlFor="email"
+                htmlFor="phone"
                 className="block text-sm sm:text-base font-body font-medium text-gray-700"
               >
-                Email
+                Phone Number
               </label>
               <input
-                type="email"
-                id="email"
-                name="email"
+                type="tel"
+                id="phone"
+                name="phone"
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base font-body"
-                placeholder="Your Email"
+                placeholder="Your Phone Number"
               />
             </div>
             <div>
@@ -100,11 +143,24 @@ export default function Contact() {
             <div className="text-center">
               <button
                 type="submit"
-                className="inline-flex items-center bg-indigo-600 text-white font-body font-medium py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors text-sm sm:text-base"
+                disabled={isSubmitting}
+                className="inline-flex items-center bg-indigo-600 text-white font-body font-medium py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
               </button>
             </div>
+
+            {submitStatus === "success" && (
+              <div className="p-4 bg-green-100 text-green-700 rounded-lg text-center">
+                Message sent successfully! We'll contact you soon via Telegram.
+              </div>
+            )}
+
+            {submitStatus === "error" && (
+              <div className="p-4 bg-red-100 text-red-700 rounded-lg text-center">
+                Failed to send message. Please try again later.
+              </div>
+            )}
           </form>
         </motion.div>
       </div>

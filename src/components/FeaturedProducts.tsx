@@ -134,7 +134,7 @@ export default function FeaturedProducts() {
 
   return (
     <motion.section
-      id="featured"
+      id="collection"
       className="py-12 sm:py-16 bg-gray-50"
       ref={ref}
       initial="hidden"
