@@ -5,23 +5,35 @@ export default async function handler(req, res) {
 
   try {
     const { name, phone, message } = req.body;
-    const text = `New Glasses Order:\nName: ${name}\nPhone: ${phone}\nMessage: ${message}`;
 
-    const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    // Validate required fields
+    if (!name || !phone || !message) {
+      return res.status(400).json({ error: 'Missing fields' });
+    }
+
+    const text = `📱 New Glasses Order:\nName: ${name}\nPhone: ${phone}\nMessage: ${message}`;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
 
     const telegramRes = await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      `https://api.telegram.org/bot${botToken}/sendMessage`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text }),
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: text,
+          parse_mode: 'Markdown',
+        }),
       }
     );
 
     const data = await telegramRes.json();
-    res.status(200).json({ success: true });
+    if (!data.ok) throw new Error(data.description || 'Telegram API error');
+
+    return res.status(200).json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to send message' });
+    console.error('Telegram API error:', error);
+    return res.status(500).json({ error: error.message });
   }
 }
