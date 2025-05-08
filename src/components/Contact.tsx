@@ -146,7 +146,7 @@ export default function Contact() {
 
             {submitStatus === "error" && (
               <div className="p-4 bg-red-100 text-red-700 rounded-lg text-center">
-                Failed to send message. Please try again later.
+                You can only submit a message once every 6 hours
               </div>
             )}
           </form>
