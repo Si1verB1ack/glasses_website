@@ -4,6 +4,12 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Check if cookie exists and is valid
+    const cookieName = 'messageSubmitted';
+    if (req.cookies[cookieName]) {
+      return res.status(429).json({ error: 'You can only submit a message once every 6 hours' });
+    }
+
     const { name, phone, message } = req.body;
 
     // Validate required fields
@@ -31,6 +37,9 @@ export default async function handler(req, res) {
     const data = await telegramRes.json();
     if (!data.ok) throw new Error(data.description || 'Telegram API error');
 
+    // Set cookie for 6 hours (21600 seconds)
+    res.setHeader('Set-Cookie', `${cookieName}=true; Max-Age=21600; Path=/; HttpOnly; SameSite=Lax`);
+    
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error('Telegram API error:', error);
