@@ -142,7 +142,7 @@ export default function FeaturesSection() {
       opacity: 1,
       transition: {
         when: "beforeChildren",
-        staggerChildren: 0.15,
+        staggerChildren: 0.2, // Slightly slower stagger
       },
     },
   };
@@ -154,8 +154,18 @@ export default function FeaturesSection() {
       y: 0,
       transition: {
         type: "spring",
-        stiffness: 100,
+        stiffness: 100, // Softer spring
         damping: 15,
+        mass: 0.5, // Added mass for more natural movement
+      },
+    },
+    hover: {
+      y: -5,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 10,
+        duration: 0.25, // Slightly longer duration
       },
     },
   };
@@ -168,7 +178,7 @@ export default function FeaturesSection() {
       rotate: 0,
       transition: {
         type: "spring",
-        stiffness: 300,
+        stiffness: 200, // Softer spring
         damping: 10,
       },
     },
@@ -176,19 +186,7 @@ export default function FeaturesSection() {
       scale: 1.1,
       rotate: [0, 5, -5, 0],
       transition: {
-        duration: 0.3,
-      },
-    },
-  };
-
-  const titleVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.3,
-        ease: [0.43, 0.13, 0.23, 0.96],
+        duration: 0.4, // Slower wiggle
       },
     },
   };
@@ -204,7 +202,9 @@ export default function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
           className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8 sm:mb-12"
-          variants={titleVariants}
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         >
           Why Choose Our Glasses
         </motion.h2>
@@ -216,11 +216,17 @@ export default function FeaturesSection() {
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              className="bg-white p-6 sm:p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300"
+              className="bg-white p-6 sm:p-8 rounded-xl shadow-sm transition-all duration-300"
               variants={cardVariants}
-              whileHover={{ 
+              whileHover={{
                 y: -5,
-                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
+                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                transition: {
+                  type: "spring",
+                  stiffness: 250,
+                  damping: 10,
+                  duration: 0.3,
+                },
               }}
             >
               <motion.div
@@ -233,11 +239,9 @@ export default function FeaturesSection() {
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">
                 {feature.title}
               </h3>
-              <motion.p 
-                className="text-gray-600 text-sm sm:text-base"
-              >
+              <p className="text-gray-600 text-sm sm:text-base">
                 {feature.description}
-              </motion.p>
+              </p>
             </motion.div>
           ))}
         </motion.div>
