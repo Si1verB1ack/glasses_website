@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function PageDetail() {
   const { state } = useLocation();
@@ -10,7 +10,10 @@ function PageDetail() {
   return (
     <div className="max-w-4xl mx-auto p-6 pt-24">
       <h1 className="text-3xl font-bold mb-4">{displayTitle}</h1>
-      <div className="prose" dangerouslySetInnerHTML={{ __html: displayContent }} />
+      <div
+        className="prose"
+        dangerouslySetInnerHTML={{ __html: displayContent }}
+      />
     </div>
   );
 }

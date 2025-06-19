@@ -9,7 +9,7 @@ import TestimonialsSection from "./components/TestimonialsSection";
 import Footer from "./components/Footer";
 import Contact from "./components/Contact";
 import Shop from "./components/Shop";
-import PageDetail from "./components/pageDetail";
+import PageDetail from "./components/PageDetail";
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
