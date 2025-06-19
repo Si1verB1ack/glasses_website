@@ -121,7 +121,6 @@ export default function TestimonialsSection() {
                     src={testimonial.avatar}
                     alt={testimonial.author}
                     className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-indigo-400"
-                    whileHover={{ scale: 1.1 }}
                     transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   />
                   <div className="ml-3">

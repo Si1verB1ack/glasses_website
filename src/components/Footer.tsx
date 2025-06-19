@@ -1,11 +1,37 @@
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+interface Page {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  is_active: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PagesResponse {
+  pages: Page[];
+  total: number;
+  total_pages: number;
+  current_page: number;
+  per_page: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
 
 export default function Footer() {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
+
+  const navigate = useNavigate();
+  const [pages, setPages] = useState<Page[]>([]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -42,6 +68,32 @@ export default function Footer() {
         stiffness: 300,
       },
     }),
+  };
+
+  // Fetch pages
+  useEffect(() => {
+    const fetchPages = async () => {
+      try {
+        const response = await fetch("https://glasses-backend-kci0.onrender.com/api/pages", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data: PagesResponse = await response.json();
+        if (Array.isArray(data.pages)) {
+          setPages(data.pages);
+        }
+      } catch (error) {
+        console.error("Failed to fetch pages:", error);
+      }
+    };
+
+    fetchPages();
+  }, []);
+
+  const handleLinkClick = (page: Page) => {
+    navigate(`/page/${page.slug}`, { state: { title: page.title, content: page.content } });
   };
 
   return (
@@ -95,12 +147,12 @@ export default function Footer() {
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <h3 className="text-lg sm:text-xl font-bold mb-4">Shop</h3>
+            <h3 className="text-lg sm:text-xl font-bold mb-4">Support</h3>
             <ul className="space-y-3 text-sm sm:text-base">
               {[
-                "All Glasses",
-                "Sunglasses",
-                "New Arrivals",
+                "FAQ",
+                "Warranty Information",
+                "Contact Us",
               ].map((item, i) => (
                 <motion.li
                   key={item}
@@ -120,24 +172,24 @@ export default function Footer() {
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <h3 className="text-lg sm:text-xl font-bold mb-4">Support</h3>
+            <h3 className="text-lg sm:text-xl font-bold mb-4">More link</h3>
             <ul className="space-y-3 text-sm sm:text-base">
-              {[
-                "FAQ",
-                "Warranty Information",
-                "Contact Us",
-              ].map((item, i) => (
+              {pages.map((page, i) => (
                 <motion.li
-                  key={item}
+                  key={page.id}
                   initial={{ opacity: 0, x: -10 }}
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ delay: 0.1 + i * 0.05 }}
                 >
                   <a
                     href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLinkClick(page);
+                    }}
+                    className="text-gray-400 hover:text-white transition-colors cursor-pointer"
                   >
-                    {item}
+                    {page.title}
                   </a>
                 </motion.li>
               ))}

@@ -142,51 +142,21 @@ export default function FeaturesSection() {
       opacity: 1,
       transition: {
         when: "beforeChildren",
-        staggerChildren: 0.2, // Slightly slower stagger
+        staggerChildren: 0.2,
       },
     },
   };
 
+  // Simplified card animation from TestimonialsSection
   const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { y: 20, opacity: 0 },
     visible: {
-      opacity: 1,
       y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100, // Softer spring
-        damping: 15,
-        mass: 0.5, // Added mass for more natural movement
-      },
-    },
-    hover: {
-      y: -5,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 10,
-        duration: 0.25, // Slightly longer duration
-      },
-    },
-  };
-
-  const iconVariants = {
-    hidden: { opacity: 0, scale: 0.8, rotate: -15 },
-    visible: {
       opacity: 1,
-      scale: 1,
-      rotate: 0,
       transition: {
         type: "spring",
-        stiffness: 200, // Softer spring
+        stiffness: 100,
         damping: 10,
-      },
-    },
-    hover: {
-      scale: 1.1,
-      rotate: [0, 5, -5, 0],
-      transition: {
-        duration: 0.4, // Slower wiggle
       },
     },
   };
@@ -204,7 +174,7 @@ export default function FeaturesSection() {
           className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8 sm:mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 1, ease: "easeOut" }}
         >
           Why Choose Our Glasses
         </motion.h2>
@@ -216,26 +186,13 @@ export default function FeaturesSection() {
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              className="bg-white p-6 sm:p-8 rounded-xl shadow-sm transition-all duration-300"
+              className="bg-white p-6 sm:p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
               variants={cardVariants}
-              whileHover={{
-                y: -5,
-                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
-                transition: {
-                  type: "spring",
-                  stiffness: 250,
-                  damping: 10,
-                  duration: 0.3,
-                },
-              }}
+              whileHover={{ y: -5 }}
             >
-              <motion.div
-                className="bg-indigo-100 p-3 rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center mb-4"
-                variants={iconVariants}
-                whileHover="hover"
-              >
+              <div className="bg-indigo-100 p-3 rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center mb-4">
                 {feature.icon}
-              </motion.div>
+              </div>
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">
                 {feature.title}
               </h3>

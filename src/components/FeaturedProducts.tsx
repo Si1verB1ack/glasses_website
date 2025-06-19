@@ -1,69 +1,74 @@
+const viewAllVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: 0.3,
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+};
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  reviews: number;
+  image_url: string;
+}
 
 export default function FeaturedProducts() {
-  const products = [
-    {
-      id: 1,
-      name: "Vista Classic",
-      color: "Black",
-      price: "$189.99",
-      rating: 4.9,
-      reviews: 241,
-      image:
-        "https://images.unsplash.com/photo-1577803645773-f96470509666?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-    {
-      id: 2,
-      name: "Vista Aviator",
-      color: "Gold/Brown",
-      price: "$219.99",
-      rating: 4.8,
-      reviews: 189,
-      image:
-        "https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-    {
-      id: 3,
-      name: "Vista Midnight",
-      color: "Deep Blue",
-      price: "$249.99",
-      rating: 4.9,
-      reviews: 156,
-      image:
-        "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-    {
-      id: 4,
-      name: "Vista Elegance",
-      color: "Crystal",
-      price: "$229.99",
-      rating: 4.7,
-      reviews: 113,
-      image:
-        "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-    {
-      id: 5,
-      name: "Vista Explorer",
-      color: "Tortoise",
-      price: "$209.99",
-      rating: 4.8,
-      reviews: 98,
-      image:
-        "https://images.unsplash.com/photo-1546180245-c59500ad14d0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-    {
-      id: 6,
-      name: "Vista Sport",
-      color: "Black/Red",
-      price: "$199.99",
-      rating: 4.9,
-      reviews: 152,
-      image:
-        "https://images.unsplash.com/photo-1508296695146-257a814070b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [perPage] = useState(10);
+  const [search, setSearch] = useState("");
+  const [activeOnly, setActiveOnly] = useState(false);
+  const [featuredOnly, setFeaturedOnly] = useState(true);
+
+  // Fetch products from the backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const queryParams = new URLSearchParams({
+          page: "1",
+          per_page: "6",
+          search: search,
+          ...(activeOnly && { active_only: activeOnly.toString() }),
+          ...(featuredOnly && { featured_only: featuredOnly.toString() }),
+        });
+        const response = await fetch(
+          `https://glasses-backend-kci0.onrender.com/api/products?${queryParams}`,
+          {
+            method: "GET",
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const productData = await response.json();
+        console.log("Fetched products:", productData.products);
+        const data = productData.products || []; // Ensure data is an array
+        // Assuming the API returns an array of products with id, name, price, reviews, image
+        setProducts(data || []);
+        console.log("Fetched products:", data);
+        setLoading(false);
+      } catch (err: any) {
+        console.error("Error fetching products:", err);
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -76,32 +81,31 @@ export default function FeaturedProducts() {
       opacity: 1,
       transition: {
         when: "beforeChildren",
-        staggerChildren: 0.15,
+        staggerChildren: 0.1,
       },
     },
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
+        duration: 0.4,
+        ease: [0.25, 0.46, 0.45, 0.94],
       },
     },
   };
 
   const imageVariants = {
-    hidden: { opacity: 0.7, scale: 0.95 },
+    hidden: { opacity: 0.9, scale: 0.98 },
     visible: {
       opacity: 1,
       scale: 1,
       transition: {
-        duration: 0.6,
-        ease: [0.43, 0.13, 0.23, 0.96],
+        duration: 0.4,
+        ease: [0.25, 0.46, 0.45, 0.94],
       },
     },
   };
@@ -109,28 +113,34 @@ export default function FeaturedProducts() {
   const buttonVariants = {
     rest: { scale: 1 },
     hover: {
-      scale: 1.05,
+      scale: 1.02,
       transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 10,
+        duration: 0.2,
+        ease: "easeOut",
       },
     },
-    tap: { scale: 0.95 },
+    tap: { scale: 0.98 },
   };
 
-  const viewAllVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: 0.6,
-        duration: 0.6,
-        ease: [0.43, 0.13, 0.23, 0.96],
-      },
-    },
-  };
+  if (loading) {
+    return (
+      <section className="py-12 sm:py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-gray-600">Loading products...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-12 sm:py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-red-600">Error: {error}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <motion.section
@@ -144,9 +154,9 @@ export default function FeaturedProducts() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-10 sm:mb-12"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Featured Collection
@@ -169,35 +179,21 @@ export default function FeaturedProducts() {
               className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
               variants={cardVariants}
               whileHover={{
-                y: -4,
+                y: -2,
                 boxShadow:
-                  "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                  "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
               }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: 0.99 }}
             >
               <div className="h-48 sm:h-64 overflow-hidden relative">
                 <motion.img
-                  src={product.image}
-                  alt={product.name}
+                  src={product.image_url || "https://placehold.co/600x400"}
+                  alt={product.name || "Product image"}
                   className="w-full h-full object-cover"
                   variants={imageVariants}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.4 }}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
                 />
-                <motion.div
-                  className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm"
-                  initial={{ scale: 0 }}
-                  animate={inView ? { scale: 1 } : {}}
-                  transition={{ delay: 0.4, type: "spring" }}
-                >
-                  <svg
-                    className="h-5 w-5 text-yellow-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3 .921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784 .57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81 .588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                </motion.div>
               </div>
               <div className="p-4 sm:p-6">
                 <div className="flex justify-between items-start mb-2">
@@ -205,42 +201,13 @@ export default function FeaturedProducts() {
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                       {product.name}
                     </h3>
-                    <p className="text-gray-600 text-sm sm:text-base">
-                      {product.color}
-                    </p>
                   </div>
                   <span className="text-base sm:text-lg font-bold text-gray-900">
-                    {product.price}
-                  </span>
-                </div>
-                <div className="flex items-center mb-4">
-                  <div className="flex mr-2">
-                    {[...Array(5)].map((_, i) => (
-                      <motion.svg
-                        key={i}
-                        className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400"
-                        fill={
-                          i < Math.floor(product.rating)
-                            ? "currentColor"
-                            : "none"
-                        }
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        viewBox="0 0 24 24"
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={inView ? { scale: 1, opacity: 1 } : {}}
-                        transition={{ delay: 0.2 + i * 0.05 }}
-                      >
-                        <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                      </motion.svg>
-                    ))}
-                  </div>
-                  <span className="text-sm sm:text-base text-gray-600">
-                    {product.rating} ({product.reviews})
+                    $ {parseFloat(product.price).toFixed(2)}
                   </span>
                 </div>
                 <motion.button
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center text-sm sm:text-base"
+                  className="w-full cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center text-sm sm:text-base"
                   variants={buttonVariants}
                   initial="rest"
                   whileHover="hover"
@@ -273,34 +240,37 @@ export default function FeaturedProducts() {
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
         >
-          <motion.a
-            href="#featured"
+          <motion.div
             className="inline-flex items-center text-indigo-600 font-semibold hover:text-indigo-800 text-sm sm:text-base"
+            variants={viewAllVariants}
+            initial="hidden"
+            animate="visible"
             whileHover={{
-              x: 4,
+              x: 2,
               transition: {
-                type: "spring",
-                stiffness: 400,
-                damping: 10,
+                duration: 0.2,
+                ease: "easeOut",
               },
             }}
           >
-            View All Collection
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 sm:h-5 sm:w-5 ml-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14 5l7 7m0 0l-7 7m7-7H3"
-              />
-            </svg>
-          </motion.a>
+            <Link to="/shop" className="inline-flex items-center">
+              View All Collection
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 sm:h-5 sm:w-5 ml-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
+              </svg>
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </motion.section>

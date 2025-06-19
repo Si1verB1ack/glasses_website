@@ -1,4 +1,5 @@
 import { motion, useScroll, useTransform } from "framer-motion";
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
   isMenuOpen: boolean;
@@ -46,44 +47,45 @@ export default function Header({ isMenuOpen, setIsMenuOpen }: HeaderProps) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
           >
-            <a href="#hero">VISTA</a>
+            <Link to="/">VISTA</Link>
           </motion.h1>
           <nav className="hidden md:flex space-x-6">
-            {["Collection", "Features", "Testimonials", "Contact"].map((text, i) => (
-              <motion.a
+            {["Shop", "Features", "Testimonials", "Contact"].map((text, i) => (
+              <motion.div
                 key={text}
-                href={`#${text.toLowerCase()}`}
                 className="text-gray-700 hover:text-gray-900 font-body text-sm sm:text-base motion-blur"
                 custom={i}
                 variants={linkVariants}
                 initial="hidden"
                 animate="visible"
               >
-                {text}
-              </motion.a>
+                {text === "Shop" ? (
+                  <Link to="/shop">{text}</Link>
+                ) : (
+                  <Link to={`/#${text.toLowerCase()}`}>{text}</Link>
+                )}
+              </motion.div>
             ))}
           </nav>
         </div>
         {!isMenuOpen && (
           <div className="flex items-center space-x-2 ml-auto">
-            <motion.a
-              href="#contact"
+            <motion.div
               className="hidden sm:block bg-gray-200 text-gray-700 font-body font-medium py-1 px-3 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base motion-blur"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
             >
-              Sign Up
-            </motion.a>
-            <motion.a
-              href="#contact"
+              <Link to="/#contact">Sign Up</Link>
+            </motion.div>
+            <motion.div
               className="hidden sm:block bg-indigo-600 text-white font-body font-medium py-1 px-3 rounded-lg hover:bg-indigo-700 transition-colors text-sm sm:text-base motion-blur"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.5, ease: [0.4, 0, 0.2, 1] }}
             >
-              Contact Us
-            </motion.a>
+              <Link to="/#contact">Contact Us</Link>
+            </motion.div>
           </div>
         )}
         <motion.div

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 interface MobileMenuProps {
   setIsMenuOpen: (open: boolean) => void;
@@ -62,19 +63,24 @@ export default function MobileMenu({ setIsMenuOpen }: MobileMenuProps) {
         </svg>
       </motion.button>
       <nav className="flex flex-col items-center space-y-6 text-lg font-body">
-        {["Home", "Collection", "Features", "Testimonials", "Contact"].map((text, i) => (
-          <motion.a
+        {["Home", "Shop", "Features", "Testimonials", "Contact"].map((text, i) => (
+          <motion.div
             key={text}
-            href={`#${text.toLowerCase()}`}
             className="text-gray-700 hover:text-gray-900 font-medium motion-blur"
-            onClick={handleNavClick}
             custom={i}
             variants={linkVariants}
             initial="hidden"
             animate="visible"
+            onClick={handleNavClick}
           >
-            {text}
-          </motion.a>
+            {text === "Shop" ? (
+              <Link to="/shop">{text}</Link>
+            ) : text === "Home" ? (
+              <Link to="/">{text}</Link>
+            ) : (
+              <a href={`#${text.toLowerCase()}`}>{text}</a>
+            )}
+          </motion.div>
         ))}
         <motion.div
           className="flex space-x-6 pt-4"
