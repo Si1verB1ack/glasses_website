@@ -27,11 +27,9 @@ export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [perPage] = useState(10);
-  const [search, setSearch] = useState("");
-  const [activeOnly, setActiveOnly] = useState(false);
-  const [featuredOnly, setFeaturedOnly] = useState(true);
+  const [search] = useState("");
+  const [activeOnly] = useState(false);
+  const [featuredOnly] = useState(true);
 
   // Fetch products from the backend
   useEffect(() => {
