@@ -1,7 +1,6 @@
 import { useLocation, useParams } from "react-router-dom";
 
 function PageDetail() {
-  const { slug } = useParams();
   const { state } = useLocation();
   const { title, content } = state || {};
 
