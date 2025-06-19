@@ -48,6 +48,7 @@ export default function FeaturedProducts() {
   const [search] = useState("");
   const [activeOnly] = useState(false);
   const [featuredOnly] = useState(true);
+  const skeletonCount = 3; // Reduced to 3 skeletons
 
   // Fetch products from the backend
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function FeaturedProducts() {
         }
         const productData = await response.json();
         console.log("Fetched products:", productData.products);
-        const data = productData.products || []; // Ensure data is an array
+        const data = productData.products || [];
         setProducts(data || []);
         console.log("Fetched products:", data);
         setLoading(false);
@@ -151,7 +152,7 @@ export default function FeaturedProducts() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {Array.from({ length: 6 }).map((_, index) => (
+            {Array.from({ length: skeletonCount }).map((_, index) => (
               <ProductCardSkeleton key={index} />
             ))}
           </div>

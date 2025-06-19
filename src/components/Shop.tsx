@@ -1,4 +1,4 @@
-import { SetStateAction, useState, useEffect } from "react";
+import { SetStateAction, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { debounce } from "lodash";
@@ -48,16 +48,17 @@ export default function Shop() {
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
   const productsPerPage = 15;
+  const skeletonCount = 3; // Reduced to 3 skeletons to avoid awkwardness
 
-  // Fetch products from the backend
-  useEffect(() => {
-    const fetchProducts = async () => {
+  // Debounced fetch function
+  const fetchProducts = useCallback(
+    debounce(async (searchQuery: string, page: number) => {
       try {
         setLoading(true);
         const queryParams = new URLSearchParams({
-          page: currentPage.toString(),
+          page: page.toString(),
           per_page: productsPerPage.toString(),
-          search: search,
+          search: searchQuery,
           active_only: "true",
         });
         const response = await fetch(
@@ -82,10 +83,14 @@ export default function Shop() {
         setError(err.message);
         setLoading(false);
       }
-    };
+    }, 300),
+    [productsPerPage]
+  );
 
-    fetchProducts();
-  }, [currentPage, search, productsPerPage]);
+  // Fetch products when currentPage or search changes
+  useEffect(() => {
+    fetchProducts(search, currentPage);
+  }, [search, currentPage, fetchProducts]);
 
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -144,10 +149,10 @@ export default function Shop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSearch = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    setCurrentPage(1);
-  }, 300);
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value); // Update search state immediately
+    setCurrentPage(1); // Reset to first page
+  };
 
   if (loading) {
     return (
@@ -169,12 +174,11 @@ export default function Shop() {
                 placeholder="Search products..."
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base font-body"
                 aria-label="Search products"
-                disabled
               />
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
-            {Array.from({ length: productsPerPage }).map((_, index) => (
+            {Array.from({ length: skeletonCount }).map((_, index) => (
               <ProductCardSkeleton key={index} />
             ))}
           </div>
@@ -192,25 +196,7 @@ export default function Shop() {
             onClick={() => {
               setError(null);
               setLoading(true);
-              const queryParams = new URLSearchParams({
-                page: currentPage.toString(),
-                per_page: productsPerPage.toString(),
-                search: search,
-                active_only: "true",
-              });
-              fetch(
-                `https://glasses-backend-kci0.onrender.com/api/products?${queryParams}`
-              )
-                .then((response) => response.json())
-                .then((productData) => {
-                  setProducts(productData.products || []);
-                  setTotalPages(productData.pages || 1);
-                  setLoading(false);
-                })
-                .catch((err) => {
-                  setError(err.message);
-                  setLoading(false);
-                });
+              fetchProducts(search, currentPage);
             }}
             className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg"
           >
