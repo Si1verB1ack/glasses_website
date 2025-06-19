@@ -23,6 +23,24 @@ interface Product {
   image_url: string;
 }
 
+// Skeleton component for product card
+const ProductCardSkeleton = () => {
+  return (
+    <div className="bg-white rounded-lg overflow-hidden shadow-md animate-pulse">
+      <div className="h-48 sm:h-64 bg-gray-200"></div>
+      <div className="p-4 sm:p-6">
+        <div className="flex justify-between items-start mb-2">
+          <div className="w-3/4">
+            <div className="h-5 bg-gray-200 rounded w-3/4"></div>
+          </div>
+          <div className="h-5 bg-gray-200 rounded w-1/4"></div>
+        </div>
+        <div className="h-10 bg-gray-200 rounded-lg mt-4"></div>
+      </div>
+    </div>
+  );
+};
+
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +72,6 @@ export default function FeaturedProducts() {
         const productData = await response.json();
         console.log("Fetched products:", productData.products);
         const data = productData.products || []; // Ensure data is an array
-        // Assuming the API returns an array of products with id, name, price, reviews, image
         setProducts(data || []);
         console.log("Fetched products:", data);
         setLoading(false);
@@ -124,7 +141,20 @@ export default function FeaturedProducts() {
     return (
       <section className="py-12 sm:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-600">Loading products...</p>
+          <div className="text-center mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Featured Collection
+            </h2>
+            <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
+              Explore our most popular styles crafted with precision and designed
+              for comfort
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -201,7 +231,7 @@ export default function FeaturedProducts() {
                     </h3>
                   </div>
                   <span className="text-base sm:text-lg font-bold text-gray-900">
-                    $ {parseFloat(product.price).toFixed(2)}
+                    ${parseFloat(product.price).toFixed(2)}
                   </span>
                 </div>
                 <motion.button

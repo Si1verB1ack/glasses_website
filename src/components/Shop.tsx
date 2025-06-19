@@ -13,6 +13,33 @@ interface Product {
   rating?: number;
 }
 
+// Skeleton component for product card
+const ProductCardSkeleton = () => {
+  return (
+    <div className="bg-white rounded-xl shadow-md animate-pulse">
+      <div className="h-48 sm:h-56 lg:h-64 bg-gray-200"></div>
+      <div className="p-4 sm:p-5 lg:p-6">
+        <div className="flex justify-between items-start mb-3">
+          <div className="w-3/4">
+            <div className="h-5 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 mt-2"></div>
+          </div>
+          <div className="h-5 bg-gray-200 rounded w-1/4"></div>
+        </div>
+        <div className="flex items-center mb-4">
+          <div className="flex mr-2">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-4 w-4 sm:h-5 sm:w-5 bg-gray-200 rounded-full mr-1"></div>
+            ))}
+          </div>
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+        </div>
+        <div className="h-10 bg-gray-200 rounded-lg"></div>
+      </div>
+    </div>
+  );
+};
+
 export default function Shop() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,7 +153,31 @@ export default function Shop() {
     return (
       <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <p className="text-center text-gray-600">Loading products...</p>
+          <div className="text-center mb-10 sm:mb-12 lg:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 font-heading tracking-tight">
+              Our Full Collection
+            </h2>
+            <p className="mt-3 text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
+              Discover our complete range of premium eyewear, designed for style
+              and comfort.
+            </p>
+            <div className="mt-4 max-w-md mx-auto">
+              <input
+                type="text"
+                value={search}
+                onChange={handleSearch}
+                placeholder="Search products..."
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base font-body"
+                aria-label="Search products"
+                disabled
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+            {Array.from({ length: productsPerPage }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -141,7 +192,6 @@ export default function Shop() {
             onClick={() => {
               setError(null);
               setLoading(true);
-              // Trigger fetch again
               const queryParams = new URLSearchParams({
                 page: currentPage.toString(),
                 per_page: productsPerPage.toString(),
